@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escribart 2026 · El Cartonero</title>
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dorado: #f4c430;
+            --blanco-hueso: #f5eedc;
+            --negro-suave: #1a1a1a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #3a2a1f;
+            background-image: url('carton.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            position: relative;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background:
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(200,180,140,0.03) 2px, rgba(200,180,140,0.03) 4px),
+                url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            background-size: auto, 200px;
+        }
+
+        .app {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .navbar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px 20px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            border-radius: 14px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .nav-link {
+            color: var(--blanco-hueso);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 8px 18px;
+            border-radius: 20px;
+            transition: all 0.25s;
+        }
+
+        .nav-link:hover {
+            background: var(--dorado);
+            color: #1a1a1a;
+            box-shadow: 0 0 16px rgba(244,196,48,0.5);
+        }
+
+        .nav-link.activo {
+            background: var(--blanco-hueso);
+            color: #1a1a1a;
+            font-weight: 700;
+        }
+
+        .titulo-escribart {
+            font-family: 'Permanent Marker', cursive;
+            font-size: 3.5rem;
+            color: var(--dorado);
+            text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 0 20px rgba(244,196,48,0.4);
+            letter-spacing: 3px;
+            line-height: 1;
+            pointer-events: none;
+            margin-bottom: 5px;
+        }
+
+        .titulo-escribart .año {
+            display: block;
+            font-size: 1.8rem;
+            letter-spacing: 6px;
+            margin-top: -8px;
+        }
+
+        .capitulos-area {
+            margin-top: 30px;
+        }
+
+        .subtitulo-coleccion {
+            font-family: 'Permanent Marker', cursive;
+            color: var(--blanco-hueso);
+            font-size: 1.2rem;
+            text-align: center;
+            margin-bottom: 30px;
+            letter-spacing: 3px;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+        }
+
+        .capitulos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            padding: 10px;
+        }
+
+        .recorte {
+            background: #faf3e0;
+            background-image: repeating-linear-gradient(0deg, transparent, transparent 28px, rgba(0,0,0,0.03) 28px, rgba(0,0,0,0.03) 29px);
+            border: 2px solid #3a2a1f;
+            border-radius: 4px;
+            padding: 15px;
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.4), inset 0 0 15px rgba(0,0,0,0.05);
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.25s;
+            position: relative;
+            transform: rotate(var(--rot, 0deg));
+        }
+
+        .recorte:hover {
+            transform: rotate(0deg) scale(1.04);
+            box-shadow: 8px 8px 0 rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+
+        .recorte:active {
+            transform: scale(0.97);
+        }
+
+        .recorte::before {
+            content: "";
+            position: absolute;
+            top: -6px;
+            left: 20px;
+            right: 20px;
+            height: 8px;
+            background: #faf3e0;
+            border-top: 2px solid #3a2a1f;
+            border-left: 2px solid #3a2a1f;
+            border-right: 2px solid #3a2a1f;
+            border-radius: 2px 2px 0 0;
+            clip-path: polygon(0% 100%, 5% 0%, 15% 100%, 25% 0%, 35% 100%, 45% 0%, 55% 100%, 65% 0%, 75% 100%, 85% 0%, 95% 100%, 100% 0%, 100% 100%);
+        }
+
+        .recorte::after {
+            content: "";
+            position: absolute;
+            bottom: -6px;
+            left: 15px;
+            right: 15px;
+            height: 8px;
+            background: #faf3e0;
+            border-bottom: 2px solid #3a2a1f;
+            border-left: 2px solid #3a2a1f;
+            border-right: 2px solid #3a2a1f;
+            border-radius: 0 0 2px 2px;
+            clip-path: polygon(0% 0%, 5% 100%, 15% 0%, 25% 100%, 35% 0%, 45% 100%, 55% 0%, 65% 100%, 75% 0%, 85% 100%, 95% 0%, 100% 100%, 100% 0%);
+        }
+
+        .portada-img {
+            width: 100%;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            border: 2px solid #3a2a1f;
+            border-radius: 2px;
+            display: block;
+            margin-bottom: 12px;
+            background: #ddd;
+            box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+        }
+
+        .info-cap {
+            text-align: center;
+        }
+
+        .numero-cap {
+            display: inline-block;
+            font-family: 'Permanent Marker', cursive;
+            font-size: 0.85rem;
+            color: #fff;
+            background: #3a2a1f;
+            padding: 4px 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .titulo-cap {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #2c1e16;
+            letter-spacing: 0.5px;
+            line-height: 1.3;
+        }
+
+        .recorte:nth-child(odd) { --rot: -1.5deg; }
+        .recorte:nth-child(even) { --rot: 1.5deg; }
+        .recorte:nth-child(3n) { --rot: 2deg; }
+        .recorte:nth-child(5n) { --rot: -2deg; }
+        .recorte:nth-child(7n) { --rot: 0.5deg; }
+
+        .fallback-img {
+            width: 100%;
+            aspect-ratio: 3/4;
+            background: #3a2a1f;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            font-size: 0.8rem;
+            margin-bottom: 12px;
+            border: 2px solid #3a2a1f;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            color: rgba(245,238,220,0.6);
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer strong {
+            color: var(--dorado);
+        }
+
+        @media (max-width: 768px) {
+            .titulo-escribart {
+                font-size: 2.5rem;
+            }
+            .titulo-escribart .año {
+                font-size: 1.3rem;
+            }
+            .capitulos-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                gap: 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .titulo-escribart {
+                font-size: 2rem;
+            }
+            .capitulos-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app">
+
+        <nav class="navbar">
+            <a href="../index.html" class="nav-link">Principal</a>
+            <a href="index.html" class="nav-link activo">Escribart</a>
+            <a href="../dibujos/index.html" class="nav-link">Dibujos</a>
+            <a href="../novelas/index.html" class="nav-link">Novelas</a>
+            <a href="https://instagram.com/elcartonero" target="_blank" class="nav-link">Instagram</a>
+            <a href="https://youtube.com/@elcartonero" target="_blank" class="nav-link">YouTube</a>
+        </nav>
+
+        <div class="titulo-escribart">
+            Escribart
+            <span class="año">2026</span>
+        </div>
+
+        <div class="capitulos-area">
+            <p class="subtitulo-coleccion">📰 COLECCIÓN COMPLETA · 10 CAPÍTULOS</p>
+
+            <div class="capitulos-grid">
+
+                <!-- Piloto -->
+                <a href="./capitulo-piloto/index.html" class="recorte">
+                    <img class="portada-img" src="portada_capitulo_piloto.png" alt="Piloto"
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                    <div class="fallback-img">📷 Sin imagen</div>
+                    <div class="info-cap">
+                        <span class="numero-cap">Piloto</span>
+                        <div class="titulo-cap">¿Será buena idea?</div>
+                    </div>
+                </a>
+
+                <!-- Capítulo 1 -->
+                <a href="./capitulo-1/index.html" class="recorte">
+                    <img class="portada-img" src="portada_capitulo_1.png" alt="Capítulo 1"
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                    <div class="fallback-img">📷 Sin imagen</div>
+                    <div class="info-cap">
+                        <span class="numero-cap">Capítulo 1</span>
+                        <div class="titulo-cap">Huellas en la arena</div>
+                    </div>
+                </a>
+
+                <!-- Capítulo 2 -->
+                <a href="./capitulo-2/index.html" class="recorte">
+                    <img class="portada-img" src="portada_capitulo_2.png" alt="Capítulo 2"
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                    <div class="fallback-img">📷 Sin imagen</div>
+                    <div class="info-cap">
+                        <span class="numero-cap">Capítulo 2</span>
+                        <div class="titulo-cap">Secretos entre dunas</div>
+                    </div>
+                </a>
+
+                <!-- Capítulo 3 -->
+                <a href="./capitulo-3/index.html" class="recorte">
+                    <img class="portada-img" src="portada_capitulo_3.png" alt="Capítulo 3"
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                    <div class="fallback-img">📷 Sin imagen</div>
+                    <div class="info-cap">
+                        <span class="numero-cap">Capítulo 3</span>
+                        <div class="titulo-cap">El pueblo</div>
+                    </div>
+                </a>
+
+                <!-- Capítulo 4 -->
+                <a href="./capitulo-4/index.html" class="recorte">
+                    <img class="portada-img" src="portada_capitulo_4.png" alt="Capítulo 4"
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                    <div class="fallback-img">📷 Sin imagen</div>
+                    <div class="info-cap">
+                        <span class="numero-cap">Capítulo 4</span>
+                        <div class="titulo-cap">Última parada</div>
+                    </div>
+                </a>
+
+                <!-- Capítulo 5 -->
+                <a href="./capitulo-5/index.html" class="recorte">
+                    <img class="portada-img" src="portada_capitulo_5.png" alt="Capítulo 5"
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                    <div class="fallback-img">📷 Sin imagen</div>
+                    <div class="info-cap">
+                        <span class="numero-cap">Capítulo 5</span>
+                        <div class="titulo-cap">Enemigos de la paz</div>
+                    </div>
+                </a>
+
+                <!-- Capítulo 6 -->
+                <a href="./capitulo-6/index.html" class="recorte">
+                    <img class="portada-img" src="portada_capitulo_6.png" alt="Capítulo 6"
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                    <div class="fallback-img">📷 Sin imagen</div>
+                    <div class="info-cap">
+                        <span class="numero-cap">Capítulo 6</span>
+                        <div class="titulo-cap">Odios perpetuos</div>
+                    </div>
+                </a>
+
+                <!-- Capítulo 7 -->
+                <a href="./capitulo-7/index.html" class="recorte">
+                    <img class="portada-img" src="portada_capitulo_7.png" alt="Capítulo 7"
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                    <div class="fallback-img">📷 Sin imagen</div>
+                    <div class="info-cap">
+                        <span class="numero-cap">Capítulo 7</span>
+                        <div class="titulo-cap">Valle sin sombras</div>
+                    </div>
+                </a>
+
+                <!-- Capítulo 8 -->
+                <a href="./capitulo-8/index.html" class="recorte">
+                    <img class="portada-img" src="portada_capitulo_8.png" alt="Capítulo 8"
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                    <div class="fallback-img">📷 Sin imagen</div>
+                    <div class="info-cap">
+                        <span class="numero-cap">Capítulo 8</span>
+                        <div class="titulo-cap">La marcha entre antorchas</div>
+                    </div>
+                </a>
+
+                <!-- Capítulo 9 -->
+                <a href="./capitulo-9/index.html" class="recorte">
+                    <img class="portada-img" src="portada_capitulo_9.png" alt="Capítulo 9"
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                    <div class="fallback-img">📷 Sin imagen</div>
+                    <div class="info-cap">
+                        <span class="numero-cap">Capítulo 9</span>
+                        <div class="titulo-cap">¿Por qué esta sevicia?</div>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>📦 <strong>ESCRIBART 2026</strong> · Colección completa</p>
+            <p style="margin-top:4px;">El Cartonero · Historietas para mi</p>
+        </footer>
+
+    </div>
+
+    <script>
+        document.querySelectorAll('.portada-img').forEach(img => {
+            img.addEventListener('error', function() {
+                this.style.display = 'none';
+                const fb = this.nextElementSibling;
+                if (fb && fb.classList.contains('fallback-img')) fb.style.display = 'flex';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,329 @@
+:root {
+    --carton-oscuro: #8b6b4a;
+    --carton-interior: #d4b896;
+    --dorado: #f4c430;
+    --blanco-hueso: #f5eedc;
+    --tinta: #1a0f07;
+    --rojo: #c0392b;
+    --sombra: rgba(0, 0, 0, 0.5);
+
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-body: 'Barlow Condensed', sans-serif;
+    --font-jp: 'Noto Serif JP', serif;
+    --font-marker: 'Permanent Marker', cursive;
+}
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: #3a2a1f;
+    background-image: url('../carton.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: var(--tinta);
+    font-family: var(--font-body);
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: crosshair;
+    position: relative;
+}
+
+/* Filtro de papel sutil */
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(200, 180, 140, 0.04) 2px, rgba(200, 180, 140, 0.04) 4px),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+    background-size: auto, 200px;
+}
+
+/* ── Navegación superior ── */
+.top-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(26, 15, 7, 0.9);
+    backdrop-filter: blur(10px);
+    border-bottom: 2px solid var(--carton-oscuro);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 32px;
+}
+
+.back-link,
+.nav-next {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--blanco-hueso);
+    text-decoration: none;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: color 0.2s, gap 0.2s;
+}
+
+.back-link:hover {
+    color: var(--dorado);
+    gap: 12px;
+}
+
+.nav-next:hover {
+    color: var(--dorado);
+    gap: 12px;
+}
+
+.nav-chapter-id {
+    font-family: var(--font-marker);
+    font-size: 20px;
+    letter-spacing: 0.1em;
+    color: var(--dorado);
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.6);
+}
+
+/* ── Hero del capítulo ── */
+.chapter-hero {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 60px 20px 48px;
+    border-bottom: 2px solid var(--carton-oscuro);
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(4px);
+}
+
+.chapter-eyebrow {
+    font-family: var(--font-marker);
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--dorado);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.chapter-title {
+    font-family: var(--font-display);
+    font-size: clamp(50px, 10vw, 100px);
+    letter-spacing: 0.06em;
+    line-height: 0.9;
+    color: var(--blanco-hueso);
+    text-shadow:
+        4px 4px 0 var(--carton-oscuro),
+        0 0 40px rgba(244, 196, 48, 0.3);
+}
+
+.chapter-line {
+    width: 48px;
+    height: 3px;
+    background: var(--dorado);
+    margin: 20px auto;
+}
+
+.chapter-subtitle {
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: 15px;
+    color: var(--blanco-hueso);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+
+/* ── Contenedor de páginas ── */
+.comic-container {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.page-wrapper {
+    position: relative;
+    overflow: hidden;
+    background: var(--carton-interior);
+    box-shadow:
+        4px 4px 0 var(--carton-oscuro),
+        0 20px 60px rgba(0, 0, 0, 0.5);
+    outline: 2px solid rgba(0, 0, 0, 0.2);
+    outline-offset: -2px;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    border-radius: 2px;
+}
+
+.page-wrapper.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.page-wrapper::after {
+    content: attr(data-page);
+    position: absolute;
+    bottom: 10px;
+    right: 14px;
+    font-family: var(--font-marker);
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(0, 0, 0, 0.3);
+    letter-spacing: 0.1em;
+    pointer-events: none;
+}
+
+.comic-container img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ── Sección siguiente capítulo ── */
+.next-chapter-section {
+    position: relative;
+    z-index: 1;
+    padding: 60px 20px 80px;
+    text-align: center;
+    border-top: 2px solid var(--carton-oscuro);
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(4px);
+}
+
+.next-label {
+    font-family: var(--font-marker);
+    font-size: 13px;
+    color: var(--blanco-hueso);
+    letter-spacing: 0.3em;
+    margin-bottom: 16px;
+    opacity: 0.7;
+}
+
+.btn-next {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    background: transparent;
+    color: var(--blanco-hueso);
+    border: 2px solid var(--dorado);
+    font-family: var(--font-display);
+    font-size: 22px;
+    letter-spacing: 0.2em;
+    padding: 16px 48px;
+    cursor: crosshair;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    transition: color 0.3s;
+    border-radius: 4px;
+}
+
+.btn-next::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--dorado);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+}
+
+.btn-next:hover::before {
+    transform: translateX(0);
+}
+
+.btn-next span {
+    position: relative;
+    z-index: 1;
+}
+
+.btn-next:hover {
+    color: var(--tinta);
+}
+
+.btn-next .arrow {
+    font-size: 24px;
+    transition: transform 0.3s;
+    position: relative;
+    z-index: 1;
+}
+
+.btn-next:hover .arrow {
+    transform: translateX(6px);
+}
+
+.back-index {
+    display: inline-block;
+    margin-top: 24px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    color: var(--blanco-hueso);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s;
+    opacity: 0.6;
+}
+
+.back-index:hover {
+    color: var(--dorado);
+    opacity: 1;
+}
+
+/* ── Footer ── */
+footer {
+    position: relative;
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.5);
+    border-top: 2px solid var(--carton-oscuro);
+    text-align: center;
+    padding: 24px;
+    font-family: var(--font-marker);
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--blanco-hueso);
+    letter-spacing: 0.2em;
+    opacity: 0.7;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+    .top-nav {
+        padding: 12px 16px;
+    }
+    .nav-chapter-id {
+        font-size: 16px;
+    }
+    .comic-container {
+        padding: 24px 0;
+        gap: 4px;
+    }
+    .btn-next {
+        font-size: 18px;
+        padding: 14px 32px;
+    }
+    .chapter-title {
+        font-size: clamp(36px, 8vw, 60px);
+    }
+}
